@@ -38,18 +38,19 @@ function renderEvents() {
   events.forEach((evt, idx) => {
     const { years, months, days } = calculateElapsed(evt.date);
     const item = document.createElement("li");
-    item.className = "flex justify-between items-center border rounded p-2";
+    item.className =
+      "flex justify-between items-center border rounded p-2 dark:border-gray-700";
     item.innerHTML = `
           <div>
-            <p class="font-medium">${evt.name}</p>
-            <p class="text-sm text-gray-600">Started: ${evt.date}</p>
-            <p class="text-sm text-gray-700">Elapsed: ${years}y ${months}m ${days}d</p>
+            <p class="font-medium dark:text-gray-200">${evt.name}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Started: ${evt.date}</p>
+            <p class="text-sm text-gray-700 dark:text-gray-300">Elapsed: ${years}y ${months}m ${days}d</p>
           </div>
           <div class="flex space-x-2">
-            <button data-action="edit" data-index="${idx}" class="text-blue-500 hover:text-blue-700">
+            <button data-action="edit" data-index="${idx}" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
               <i class="bi bi-pencil-fill"></i>
             </button>
-            <button data-action="delete" data-index="${idx}" class="text-red-500 hover:text-red-700">
+            <button data-action="delete" data-index="${idx}" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
               <i class="bi bi-trash-fill"></i>
             </button>
           </div>

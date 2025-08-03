@@ -26,29 +26,41 @@
       body {
         font-family: "Inter", sans-serif;
       }
+      ::placeholder {
+        color: #9ca3af;
+      }
+      .dark ::placeholder {
+        color: #a1a1aa;
+      }
     </style>
   </head>
-  <body class="bg-gray-50 min-h-svh p-4">
-    <div class="max-w-md mx-auto bg-white shadow-md rounded-lg p-4">
-      <h1 class="text-2xl font-semibold text-center mb-4">Event Tracker</h1>
+  <body class="bg-gray-50 dark:bg-gray-900 min-h-svh p-4">
+    <div
+      class="max-w-md mx-auto bg-white dark:bg-gray-800 shadow-md rounded-lg p-4"
+    >
+      <h1
+        class="text-2xl font-semibold text-center mb-4 text-gray-800 dark:text-gray-100"
+      >
+        Event Tracker
+      </h1>
       <!-- Form for Create/Update -->
       <form id="event-form" class="flex flex-col space-y-2">
         <input
           type="text"
           id="event-name"
           placeholder="Event Name"
-          class="border rounded px-2 py-1 focus:outline-none focus:ring w-full"
+          class="border rounded px-2 py-1 focus:outline-none focus:ring w-full dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
           required
         />
         <input
           type="date"
           id="event-date"
-          class="border rounded px-2 py-1 focus:outline-none focus:ring w-full"
+          class="border rounded px-2 py-1 focus:outline-none focus:ring w-full dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
           required
         />
         <button
           type="submit"
-          class="bg-blue-500 text-white rounded py-1 flex items-center justify-center"
+          class="bg-blue-500 hover:bg-blue-600 text-white rounded py-1 flex items-center justify-center dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           <i class="bi bi-plus-lg mr-1"></i>
           <span id="form-button-text">Add Event</span>
