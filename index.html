@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Tracker</title>
+    <meta
+      name="description"
+      content="Track important events and anniversaries with our simple Event Tracker. Add, edit, and monitor events with elapsed time calculations. All data is stored locally in your browser."
+    />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <script defer src="index.js"></script>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (optional) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen p-4">
+    <div class="max-w-md mx-auto bg-white shadow-md rounded-lg p-4">
+      <h1 class="text-2xl font-semibold text-center mb-4">Event Tracker</h1>
+      <!-- Form for Create/Update -->
+      <form id="event-form" class="flex flex-col space-y-2">
+        <input
+          type="text"
+          id="event-name"
+          placeholder="Event Name"
+          class="border rounded px-2 py-1 focus:outline-none focus:ring"
+          required
+        />
+        <input
+          type="date"
+          id="event-date"
+          class="border rounded px-2 py-1 focus:outline-none focus:ring"
+          required
+        />
+        <button
+          type="submit"
+          class="bg-blue-500 text-white rounded py-1 flex items-center justify-center"
+        >
+          <i class="bi bi-plus-lg mr-1"></i>
+          <span id="form-button-text">Add Event</span>
+        </button>
+      </form>
+      <!-- List of Events -->
+      <ul id="event-list" class="mt-4 space-y-2"></ul>
+    </div>
+  </body>
+</html>
