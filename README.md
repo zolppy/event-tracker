@@ -1,9 +1,8 @@
-```markdown
 # Event Tracker
 
 A simple web application to track important events and anniversaries with elapsed time calculations. All data is stored locally in your browser.
 
-![Event Tracker Screenshot](screenshot.png)
+![Event Tracker Screenshot](https://github.com/user-attachments/assets/deb29fb7-bc39-497b-844a-aa9341d20741)
 
 ## Features
 
@@ -88,5 +87,3 @@ Potential future features:
 - Notifications/reminders
 - Export/import functionality
 - Dark mode support
-```
-# event-tracker
