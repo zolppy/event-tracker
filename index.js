@@ -64,46 +64,72 @@ function renderEvents() {
     });
 }
 
-// Add or update event
-const form = document.getElementById("event-form");
+// Form Modal
+const formModal = document.getElementById("form-modal");
+const formModalTitle = document.getElementById("form-modal-title");
+const eventForm = document.getElementById("event-form");
+const eventNameInput = document.getElementById("event-name");
+const eventDateInput = document.getElementById("event-date");
+const addEventButton = document.getElementById("add-event-button");
+const formCancelButton = document.getElementById("form-cancel");
 let editIndex = null;
-form.addEventListener("submit", (e) => {
+
+function showFormModal(index = null) {
+  editIndex = index;
+  if (index !== null) {
+    const events = loadEvents();
+    const event = events[index];
+    formModalTitle.textContent = "Editar Evento";
+    eventNameInput.value = event.name;
+    eventDateInput.value = event.date;
+  } else {
+    formModalTitle.textContent = "Adicionar Evento";
+    eventForm.reset();
+  }
+  formModal.classList.remove("hidden");
+}
+
+function hideFormModal() {
+  formModal.classList.add("hidden");
+  editIndex = null;
+  eventForm.reset();
+}
+
+addEventButton.addEventListener("click", () => showFormModal());
+formCancelButton.addEventListener("click", () => hideFormModal());
+
+eventForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const name = document.getElementById("event-name").value.trim();
-  const date = document.getElementById("event-date").value;
+  const name = eventNameInput.value.trim();
+  const date = eventDateInput.value;
   if (!name || !date) return;
   const events = loadEvents();
   if (editIndex !== null) {
     events[editIndex] = { name, date };
-    editIndex = null;
   } else {
     events.push({ name, date });
   }
   saveEvents(events);
-  form.reset();
-  document.getElementById("form-button-text").textContent = "Adicionar Evento";
+  hideFormModal();
   renderEvents();
 });
 
 // Handle edit/delete buttons
-document.getElementById("event-list").addEventListener("click", (e) => {
+document.getElementById("event-list").addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
   const action = btn.getAttribute("data-action");
   const idx = parseInt(btn.getAttribute("data-index"), 10);
-  const events = loadEvents();
   if (action === "delete") {
-    if (confirm("Excluir este evento?")) {
+    const confirmed = await showModal("Excluir Evento", "Tem certeza que deseja excluir este evento?");
+    if (confirmed) {
+      const events = loadEvents();
       events.splice(idx, 1);
       saveEvents(events);
       renderEvents();
     }
   } else if (action === "edit") {
-    const evt = events[idx];
-    document.getElementById("event-name").value = evt.name;
-    document.getElementById("event-date").value = evt.date;
-    document.getElementById("form-button-text").textContent = "Atualizar Evento";
-    editIndex = idx;
+    showFormModal(idx);
   }
 });
 
@@ -129,24 +155,64 @@ importFileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = (event) => {
+  reader.onload = async (event) => {
     try {
       const newEvents = JSON.parse(event.target.result);
       if (Array.isArray(newEvents) && newEvents.every(evt => evt.name && evt.date)) {
-        if (confirm("A importação substituirá os eventos existentes. Continuar?")) {
+        const confirmed = await showModal("Importar Eventos", "A importação substituirá os eventos existentes. Continuar?");
+        if (confirmed) {
           saveEvents(newEvents);
           renderEvents();
         }
       } else {
-        alert("Formato de arquivo JSON inválido.");
+        await showModal("Erro de Importação", "Formato de arquivo JSON inválido.", "OK", null);
       }
     } catch (error) {
-      alert("Erro ao ler ou analisar o arquivo JSON.");
+      await showModal("Erro de Importação", "Erro ao ler ou analisar o arquivo JSON.", "OK", null);
     }
     importFileInput.value = ""; // Reset file input
   };
   reader.readAsText(file);
 });
+
+// Confirmation Modal
+const modal = document.getElementById("modal");
+const modalTitle = document.getElementById("modal-title");
+const modalMessage = document.getElementById("modal-message");
+const modalConfirm = document.getElementById("modal-confirm");
+const modalCancel = document.getElementById("modal-cancel");
+let modalResolve;
+
+function showModal(title, message, confirmText = "Confirmar", cancelText = "Cancelar") {
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+  modalConfirm.textContent = confirmText;
+  
+  if (cancelText) {
+    modalCancel.textContent = cancelText;
+    modalCancel.classList.remove("hidden");
+  } else {
+    modalCancel.classList.add("hidden");
+  }
+
+  modal.classList.remove("hidden");
+
+  return new Promise((resolve) => {
+    modalResolve = resolve;
+  });
+}
+
+function hideModal(result) {
+  modal.classList.add("hidden");
+  if (modalResolve) {
+    modalResolve(result);
+    modalResolve = null;
+  }
+}
+
+modalConfirm.addEventListener("click", () => hideModal(true));
+modalCancel.addEventListener("click", () => hideModal(false));
+
 
 // Initial render
 renderEvents();
