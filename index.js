@@ -17,6 +17,12 @@ function calculateElapsed(startDate) {
   return { years, months, days };
 }
 
+// Format date to DD/MM/YYYY
+function formatDate(dateString) {
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 // LocalStorage keys
 const STORAGE_KEY = "events";
 
@@ -32,31 +38,30 @@ function saveEvents(events) {
 
 // Render list
 function renderEvents() {
-  const list = document.getElementById("event-list");
-  list.innerHTML = "";
-  const events = loadEvents();
-  events.forEach((evt, idx) => {
-    const { years, months, days } = calculateElapsed(evt.date);
-    const item = document.createElement("li");
-    item.className =
-      "flex justify-between items-center border rounded p-2 dark:border-gray-700";
-    item.innerHTML = `
-          <div>
-            <p class="font-medium dark:text-gray-200">${evt.name}</p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Started: ${evt.date}</p>
-            <p class="text-sm text-gray-700 dark:text-gray-300">Elapsed: ${years}y ${months}m ${days}d</p>
-          </div>
-          <div class="flex space-x-2">
-            <button data-action="edit" data-index="${idx}" class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-              <i class="bi bi-pencil-fill"></i>
-            </button>
-            <button data-action="delete" data-index="${idx}" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-              <i class="bi bi-trash-fill"></i>
-            </button>
-          </div>
+    const list = document.getElementById("event-list");
+    list.innerHTML = "";
+    const events = loadEvents();
+    events.forEach((evt, idx) => {
+        const { years, months, days } = calculateElapsed(evt.date);
+        const item = document.createElement("div");
+        item.className = "glass-card rounded-lg p-4 flex justify-between items-center";
+        item.innerHTML = `
+            <div>
+                <p class="font-bold text-lg text-white">${evt.name}</p>
+                <p class="text-sm text-white/80">Início: ${formatDate(evt.date)}</p>
+                <p class="text-sm text-white/90 mt-1">Tempo: ${years}a ${months}m ${days}d</p>
+            </div>
+            <div class="flex space-x-3">
+                <button data-action="edit" data-index="${idx}" class="text-white/70 hover:text-white transition-colors">
+                    <i class="bi bi-pencil-fill text-lg"></i>
+                </button>
+                <button data-action="delete" data-index="${idx}" class="text-white/70 hover:text-white transition-colors">
+                    <i class="bi bi-trash-fill text-lg"></i>
+                </button>
+            </div>
         `;
-    list.appendChild(item);
-  });
+        list.appendChild(item);
+    });
 }
 
 // Add or update event
@@ -76,7 +81,7 @@ form.addEventListener("submit", (e) => {
   }
   saveEvents(events);
   form.reset();
-  document.getElementById("form-button-text").textContent = "Add Event";
+  document.getElementById("form-button-text").textContent = "Adicionar Evento";
   renderEvents();
 });
 
@@ -88,7 +93,7 @@ document.getElementById("event-list").addEventListener("click", (e) => {
   const idx = parseInt(btn.getAttribute("data-index"), 10);
   const events = loadEvents();
   if (action === "delete") {
-    if (confirm("Delete this event?")) {
+    if (confirm("Excluir este evento?")) {
       events.splice(idx, 1);
       saveEvents(events);
       renderEvents();
@@ -97,9 +102,50 @@ document.getElementById("event-list").addEventListener("click", (e) => {
     const evt = events[idx];
     document.getElementById("event-name").value = evt.name;
     document.getElementById("event-date").value = evt.date;
-    document.getElementById("form-button-text").textContent = "Update Event";
+    document.getElementById("form-button-text").textContent = "Atualizar Evento";
     editIndex = idx;
   }
+});
+
+// Export events to JSON
+document.getElementById("export-json").addEventListener("click", () => {
+  const events = loadEvents();
+  const dataStr = JSON.stringify(events, null, 2);
+  const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+  const exportFileDefaultName = "eventos.json";
+  const linkElement = document.createElement("a");
+  linkElement.setAttribute("href", dataUri);
+  linkElement.setAttribute("download", exportFileDefaultName);
+  linkElement.click();
+});
+
+// Import events from JSON
+const importFileInput = document.getElementById("import-file");
+document.getElementById("import-json").addEventListener("click", () => {
+  importFileInput.click();
+});
+
+importFileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const newEvents = JSON.parse(event.target.result);
+      if (Array.isArray(newEvents) && newEvents.every(evt => evt.name && evt.date)) {
+        if (confirm("A importação substituirá os eventos existentes. Continuar?")) {
+          saveEvents(newEvents);
+          renderEvents();
+        }
+      } else {
+        alert("Formato de arquivo JSON inválido.");
+      }
+    } catch (error) {
+      alert("Erro ao ler ou analisar o arquivo JSON.");
+    }
+    importFileInput.value = ""; // Reset file input
+  };
+  reader.readAsText(file);
 });
 
 // Initial render
